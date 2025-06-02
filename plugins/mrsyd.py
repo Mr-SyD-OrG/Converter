@@ -5,7 +5,7 @@ from pyrogram.types import Message
 
 
 @Client.on_message(filters.document)
-async def handle_file(client: Client, message: Message):
+async def handle_fle(client: Client, message: Message):
     buttons = InlineKeyboardMarkup(
         [
             [InlineKeyboardButton("➕ Create Archive", callback_data="create_archive")],
