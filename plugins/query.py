@@ -248,7 +248,7 @@ async def callback_hanler(client: Client, callback_query: CallbackQuery):
     file_name = media.file_name or "file"
 
     # (2) Create Archive
-    elif data == "create_archive":
+    if data == "create_archive":
         await callback_query.answer("Creating ZIP archive...")
 
         with TemporaryDirectory() as temp_dir:
@@ -268,3 +268,61 @@ async def callback_hanler(client: Client, callback_query: CallbackQuery):
                 document=zip_path,
                 caption=f"`{file_name}` has been archived into `{zip_name}`.",
             )
+
+    elif data == "extract_archive":
+        await callback_query.answer("Extracting ZIP archive...")
+
+        # Check extension
+        if not file_name.lower().endswith(".zip"):
+            return await callback_query.message.reply(
+                "❌ Only `.zip` files are supported for extraction."
+            )
+
+        with TemporaryDirectory() as temp_dir:
+            zip_path = os.path.join(temp_dir, file_name)
+            await client.download_media(replied, zip_path)
+
+            extract_dir = os.path.join(temp_dir, "extracted")
+            os.makedirs(extract_dir, exist_ok=True)
+
+            try:
+                with zipfile.ZipFile(zip_path, "r") as zipf:
+                    zipf.extractall(extract_dir)
+            except zipfile.BadZipFile:
+                return await callback_query.message.reply("❌ Invalid or corrupted ZIP file.")
+
+            file_list = os.listdir(extract_dir)
+            if not file_list:
+                return await callback_query.message.reply("⚠️ ZIP file was empty.")
+
+            for extracted_file in file_list:
+                full_path = os.path.join(extract_dir, extracted_file)
+                if os.path.isfile(full_path):
+                    await callback_query.message.reply_document(
+                        document=full_path,
+                        caption=f"Extracted: `{extracted_file}`",
+                    )
+     
+    elif data == "remove_audio":
+        await callback_query.answer("Removing audio from video...")
+
+        with TemporaryDirectory() as temp_dir:
+            file_path = os.path.join(temp_dir, file_name)
+            await client.download_media(replied, file_path)
+
+            output_path = os.path.join(temp_dir, f"{base_name}_noaudio{ext}")
+
+            # Run ffmpeg to remove audio
+            cmd = ["ffmpeg", "-i", file_path, "-c", "copy", "-an", output_path]
+            try:
+                subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+                # Send the audio-less video
+                await callback_query.message.reply_document(
+                    document=output_path,
+                    caption=f"`{file_name}` with audio removed.",
+                )
+            except subprocess.CalledProcessError as e:
+                await callback_query.message.reply(
+                    f"❌ Failed to remove audio.\nError: `{e}`"
+                )
