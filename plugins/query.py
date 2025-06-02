@@ -228,3 +228,43 @@ async def cb_handler(client, query: CallbackQuery):
         except:
             await query.message.delete()
             await query.message.continue_propagation()
+
+
+import os
+import zipfile
+from tempfile import TemporaryDirectory
+from pyrogram import Client, filters
+from pyrogram.types import CallbackQuery
+
+@Client.on_callback_query()
+async def callback_hanler(client: Client, callback_query: CallbackQuery):
+    data = callback_query.data
+    replied = callback_query.message.reply_to_message
+
+    if not replied or not (replied.document or replied.video or replied.audio):
+        return await callback_query.answer("Please reply to a valid file.", show_alert=True)
+
+    media = replied.document or replied.video or replied.audio
+    file_name = media.file_name or "file"
+
+    # (2) Create Archive
+    elif data == "create_archive":
+        await callback_query.answer("Creating ZIP archive...")
+
+        with TemporaryDirectory() as temp_dir:
+            file_path = os.path.join(temp_dir, file_name)
+
+            # Download the original file
+            await client.download_media(replied, file_path)
+
+            # Create a ZIP archive
+            zip_name = f"{os.path.splitext(file_name)[0]}.zip"
+            zip_path = os.path.join(temp_dir, zip_name)
+            with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+                zipf.write(file_path, arcname=file_name)
+
+            # Send the zipped file
+            await callback_query.message.reply_document(
+                document=zip_path,
+                caption=f"`{file_name}` has been archived into `{zip_name}`.",
+            )
