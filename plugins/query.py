@@ -4,6 +4,7 @@ from pyrogram import Client
 from pyrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto
 from config import Config, Txt
 from helper.database import db
+
 import random
 import psutil
 from info import AUTH_CHANNEL
@@ -232,6 +233,7 @@ async def cb_handler(client, query: CallbackQuery):
 
 import os
 import zipfile
+import subprocess
 from tempfile import TemporaryDirectory
 from pyrogram import Client, filters
 from pyrogram.types import CallbackQuery
