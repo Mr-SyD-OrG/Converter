@@ -8,6 +8,11 @@ from pyrogram.types import Message
 async def handle_file(client: Client, message: Message):
     buttons = InlineKeyboardMarkup(
         [
+            [InlineKeyboardButton("➕ Create Archive", callback_data="create_archive")],
+            [InlineKeyboardButton("➕ Extract Archive", callback_data="extract_archive")],
+            [InlineKeyboardButton("➕ remove Audion ", callback_data="remove_audio")],
+            [InlineKeyboardButton("➕ Create Archive", callback_data="create_archive")],
+            [InlineKeyboardButton("➕ Create Archive", callback_data="create_archive")],
             [InlineKeyboardButton("➕ Create Archive", callback_data="create_archive")]
         ]
     )
