@@ -240,6 +240,8 @@ async def cb_handler(client, query: CallbackQuery):
     
 
     elif data == "create_archive":
+        await query.answer("Processing...")
+        
         replied = callback_query.message.reply_to_message
         if not replied or not (replied.document or replied.video or replied.audio):
             return await callback_query.answer("Please reply to a valid file.", show_alert=True)
