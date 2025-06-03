@@ -234,16 +234,18 @@ async def cb_handler(client, query: CallbackQuery):
             await query.message.delete()
             await query.message.continue_propagation()
     
-    replied = callback_query.message.reply_to_message
+    
 
-    if not replied or not (replied.document or replied.video or replied.audio):
-        return await callback_query.answer("Please reply to a valid file.", show_alert=True)
+    
+    
 
-    media = replied.document or replied.video or replied.audio
-    file_name = media.file_name or "file"
-
-    # (2) Create Archive
     elif data == "create_archive":
+        replied = callback_query.message.reply_to_message
+        if not replied or not (replied.document or replied.video or replied.audio):
+            return await callback_query.answer("Please reply to a valid file.", show_alert=True)
+        media = replied.document or replied.video or replied.audio
+        
+        file_name = media.file_name or "file"
         await callback_query.answer("Creating ZIP archive...")
 
         with TemporaryDirectory() as temp_dir:
@@ -265,6 +267,12 @@ async def cb_handler(client, query: CallbackQuery):
             )
 
     elif data == "extract_archive":
+        replied = callback_query.message.reply_to_message
+        if not replied or not (replied.document or replied.video or replied.audio):
+            return await callback_query.answer("Please reply to a valid file.", show_alert=True)
+        media = replied.document or replied.video or replied.audio
+        
+        file_name = media.file_name or "file"
         await callback_query.answer("Extracting ZIP archive...")
 
         # Check extension
@@ -299,6 +307,12 @@ async def cb_handler(client, query: CallbackQuery):
                     )
      
     elif data == "remove_audio":
+        replied = callback_query.message.reply_to_message
+        if not replied or not (replied.document or replied.video or replied.audio):
+            return await callback_query.answer("Please reply to a valid file.", show_alert=True)
+        media = replied.document or replied.video or replied.audio
+        
+        file_name = media.file_name or "file"
         await callback_query.answer("Removing audio from video...")
 
         with TemporaryDirectory() as temp_dir:
