@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 import asyncio
-from pyrogram.types import Message
+from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 
 
 
