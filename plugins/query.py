@@ -239,7 +239,7 @@ from pyrogram import Client, filters
 from pyrogram.types import CallbackQuery
 
 @Client.on_callback_query()
-async def callback_hanler(client: Client, callback_query: CallbackQuery):
+async def callbck_hanler(client: Client, callback_query: CallbackQuery):
     data = callback_query.data
     replied = callback_query.message.reply_to_message
 
