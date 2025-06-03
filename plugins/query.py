@@ -1,6 +1,5 @@
 import shutil
 import time
-from pyrogram import Client
 from pyrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto
 from config import Config, Txt
 from helper.database import db
@@ -10,11 +9,16 @@ import psutil
 from info import AUTH_CHANNEL
 from syd import is_req_subscribed
 from helper.utils import humanbytes
-
+import os
+import zipfile
+import subprocess
+from tempfile import TemporaryDirectory
+from pyrogram import Client, filters
 
 @Client.on_callback_query()
 async def cb_handler(client, query: CallbackQuery):
     data = query.data
+    callback_query = query
     if data == "start":
         await query.message.edit_media(
             InputMediaPhoto(
@@ -228,19 +232,8 @@ async def cb_handler(client, query: CallbackQuery):
             await query.message.continue_propagation()
         except:
             await query.message.delete()
-            await query.message.continue_propagation()
-
-
-import os
-import zipfile
-import subprocess
-from tempfile import TemporaryDirectory
-from pyrogram import Client, filters
-from pyrogram.types import CallbackQuery
-
-@Client.on_callback_query()
-async def callbck_hanler(client: Client, callback_query: CallbackQuery):
-    data = callback_query.data
+            await query.message.continue_propagation(
+    
     replied = callback_query.message.reply_to_message
 
     if not replied or not (replied.document or replied.video or replied.audio):
@@ -250,7 +243,7 @@ async def callbck_hanler(client: Client, callback_query: CallbackQuery):
     file_name = media.file_name or "file"
 
     # (2) Create Archive
-    if data == "create_archive":
+    elif data == "create_archive":
         await callback_query.answer("Creating ZIP archive...")
 
         with TemporaryDirectory() as temp_dir:
